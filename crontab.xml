@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Config>
+   <crons>
+   <cron>
+   <name>4G_cell_h</name>
+   <time>20 * * * *</time>
+   <cmd>shell/4G_cell_h.sh</cmd>
+   <arg>NOW|60|180</arg>
+   </cron>
+   
+   
+    <cron>
+   <name>5G_lcucell_h</name>
+   <time>30 * * * *</time>
+   <cmd>shell/5G_lcucell_h.sh</cmd>
+   <arg>NOW|60|180</arg>
+   </cron>
+   
+   
+    <cron>
+   <name>5G_lducell_h</name>
+   <time>40 * * * *</time>
+   <cmd>shell/5G_lducell_h.sh</cmd>
+   <arg>NOW|60|180</arg>
+   </cron>
+
+
+</crons>
+</Config>

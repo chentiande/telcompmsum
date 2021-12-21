@@ -1,0 +1,2 @@
+[tongsumex]2021/10/15 10:50:02 Err(%s),sql=%s
+ dial tcp 135.152.24.232:8921: connectex: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond. create  table tmp_pmmuqvmdmofk engine=memory  select * from dm_ct_pm_4g_g_h_cel pm where 1=2
