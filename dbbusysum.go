@@ -142,8 +142,8 @@ func dpwd(pwd string) string {
 
 func main() {
 
-	var source = flag.String("mt", "dw_ct_pm_4g_cel_h_cel", "要计算的忙时表")
-	var source1 = flag.String("st", "dw_ct_pm_4g_cel_h_cel", "要抽提的表")
+	var source = flag.String("mt", "dw_ct_pm_4g_cel_h_cel", "要计算忙时的表")
+	var source1 = flag.String("st", "dw_ct_pm_4g_cel_h_cel", "要抽提数据的表")
 	var dest = flag.String("dt", "dw_ct_pm_4g_cel_bh_cel", "要输出的表")
 	var neid = flag.String("neid", "rdn", "主键")
 	var ptimecolumn = flag.String("ptimecolumn", "starttime", "时间字段")
@@ -190,7 +190,6 @@ func main() {
 		}
 	}
 
-
 	if *logfile == "" {
 		time1 := time.Now().Format("200601021504.999999999")
 		init1(time1)
@@ -211,8 +210,8 @@ func main() {
 
 	if *showVer {
 		// Printf( "build name:\t%s\nbuild ver:\t%s\nbuild time:\t%s\nCommitID:%s\n", BuildName, BuildVersion, BuildTime, CommitID )
-		fmt.Printf("build name:\t%s\n", "tongtech dbbusysum")
-		fmt.Printf("build ver:\t%s\n", "20210930")
+		
+		fmt.Printf("build ver:\t%s\n", "2022-04-01")
 
 		os.Exit(0)
 	}
@@ -229,10 +228,11 @@ func main() {
 }
 
 //通过btree存储主键，循环实现数据计算
-func runtask(allcom, ptimecolumn, neid, starttime, stoptime string, interval, timelen int64, i uint64, dest, source,source1 string, ch_run chan int, maxstr string, db *sql.DB) {
+func runtask(allcom, ptimecolumn, neid, starttime, stoptime string, interval, timelen int64, i uint64, dest, source, source1 string, ch_run chan int, maxstr string, db *sql.DB) {
 	insertsql := ""
 	selectsql := ""
-	
+	deletesql := "delete from " + dest + " where starttime=?"
+	sqlexec(db, deletesql, starttime)
 	if maxstr != "" {
 		selectsql = selectsql + maxstr + ","
 	}
@@ -241,9 +241,6 @@ func runtask(allcom, ptimecolumn, neid, starttime, stoptime string, interval, ti
 	for x := range allzb {
 		y := strings.Split(allzb[x], "#")
 		selectsql = y[0] + ","
-
-		deletesql := "delete from " + dest + " where starttime=? and bh_type=?"
-	    sqlexec(db, deletesql, starttime,y[1])
 
 		insertsql = `insert into ` + dest + ` (bh_type,starttime,busy_time,` + neid + `,` + allcom + `)
 	          select  ` + y[1] + `,?,starttime,` + neid + `,` + allcom + ` from ` + source1 + ` where ` + neid + `=? and starttime=?`
@@ -353,7 +350,11 @@ func runtask(allcom, ptimecolumn, neid, starttime, stoptime string, interval, ti
 			values := strings.Split(valuestr[0:len(valuestr)-1], "|")
 			if len(values) > 0 {
 
-				s := make([]interface{}, len(values))
+				s := make([]interface{}, len(values
+//如果为0，使用21点的数据
+				if values[1] == "0" {
+					values[2] = values[2][:11] + "21" + values[2][13:]
+				}
 				s[0] = starttime
 				s[1] = values[0]
 				s[2] = values[2]
